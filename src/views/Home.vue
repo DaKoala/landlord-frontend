@@ -17,7 +17,7 @@
                     <div class="form__label">Confirm Password</div>
                     <input class="form__input" type="password" v-model="user.confirmPassword">
                 </label>
-                <div class="form__submit">{{ header }}</div>
+                <div class="form__submit" @click="submit">{{ header }}</div>
             </form>
         </main>
     </div>
@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { login, register } from '@/service/api';
 
 @Component
 export default class Home extends Vue {
@@ -42,6 +43,42 @@ export default class Home extends Vue {
 
     changeForm() {
         this.isLogin = !this.isLogin;
+    }
+
+    submit() {
+        if (this.isLogin) {
+            this.submitLogin();
+        } else {
+            this.submitRegister();
+        }
+    }
+
+    async submitRegister() {
+        if (this.user.confirmPassword === '') {
+            alert('Please confirm your password!');
+        } else if (this.user.confirmPassword !== this.user.password) {
+            alert('Inconsistent password!');
+        } else {
+            const { data } = await register(this.user.username, this.user.password);
+            if (data.status === 200) {
+                alert('Success! Please log in again.');
+            } else {
+                alert(data.msg);
+            }
+        }
+    }
+
+    async submitLogin() {
+        if (this.user.username === '' || this.user.password === '') {
+            alert('Username or password cannot be empty!');
+            return;
+        }
+        const { data } = await login(this.user.username, this.user.password);
+        if (data.status === 200) {
+            alert('Authorized!');
+        } else {
+            alert(data.msg);
+        }
     }
 }
 </script>
