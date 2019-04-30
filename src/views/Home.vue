@@ -144,17 +144,10 @@ export default class Home extends Vue {
     }
 
     .form__submit {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
+        @include button;
         background-color: $dark-green;
         color: $white;
-        font-weight: bold;
-        font-size: 24px;
-        border-radius: 5px;
         margin-top: 40px;
-        padding: 5px 0;
         min-width: 300px;
     }
 </style>

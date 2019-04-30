@@ -11,5 +11,10 @@ export default new Router({
             name: 'home',
             component: Home,
         },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: () => import('./views/Dashboard.vue'),
+        },
     ],
 });
