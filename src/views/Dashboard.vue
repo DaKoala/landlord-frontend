@@ -21,7 +21,22 @@
             </div>
             <div class="btn--logout">Log out</div>
         </div>
-        <div class="right"></div>
+        <div class="right">
+            <form class="create">
+                <div class="create__header">Create Room</div>
+                <label>
+                    <div class="create__label create__label--first">Room name</div>
+                    <input class="create__input" type="text">
+                </label>
+                <label>
+                    <div class="create__label">Description (optional)</div>
+                    <textarea class="create__input create__input--area"></textarea>
+                </label>
+                <div class="create__btn">
+                    Create
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -67,6 +82,48 @@ export default class Dashboard extends Vue {
         top: 0;
         bottom: 0;
         background-color: $light-green;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .create__header {
+        font-size: 48px;
+        font-weight: bold;
+        color: $white;
+        margin-bottom: 20px;
+    }
+
+    .create__label {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: $dark-green;
+    }
+
+    .create__label--first {
+        margin-top: 0;
+    }
+
+    .create__input {
+        font-size: 18px;
+        color: $dark-green;
+        padding: 5px;
+        min-width: 300px;
+        border: 1px solid $dark-green;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    .create__input--area {
+        height: 150px;
+    }
+
+    .create__btn {
+        @include button;
+        background-color: $dark-green;
+        color: $white;
+        margin-top: 30px;
     }
 
     .line {
