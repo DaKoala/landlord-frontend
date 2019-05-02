@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { login, register, me } from '@/service/api';
+import { login, register } from '@/service/api';
 import BASE_URL from '@/service/config';
 
 @Component
@@ -47,10 +47,6 @@ export default class Home extends Vue {
 
     get googleUrl() {
         return `${this.baseUrl}/login/google`;
-    }
-
-    async created() {
-        this.$auth();
     }
 
     changeForm() {
