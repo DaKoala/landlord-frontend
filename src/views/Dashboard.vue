@@ -18,6 +18,7 @@
                 <div class="rooms__empty" v-if="rooms.length === 0">
                     <strong class="text--empty">There is currently no room created.</strong>
                 </div>
+                <GameRoom v-for="(room, index) in rooms" :room="room" :key="index"/>
             </div>
             <div class="btn--logout">Log out</div>
         </div>
@@ -42,24 +43,43 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import GameRoom from '@/components/GameRoom.vue';
 
 interface User {
     username: string;
     score: number;
 }
 interface Room {
-    need: number;
+    people: number;
     name: string;
-    desc: string;
+    description?: string;
 }
-@Component
+
+@Component({
+    components: { GameRoom },
+})
 export default class Dashboard extends Vue {
     user: User = {
         username: 'Egret',
         score: 300,
     };
 
-    rooms: Room[] = [];
+    rooms: Room[] = [
+        {
+            people: 1,
+            name: 'Game room',
+            description: 'Fight the landlord!',
+        },
+        {
+            people: 2,
+            name: 'Let\'s play',
+        },
+        {
+            people: 3,
+            name: 'Game room Game room Game room',
+            description: 'Fight the landlord!',
+        },
+    ];
 }
 </script>
 
@@ -163,6 +183,8 @@ export default class Dashboard extends Vue {
     .rooms {
         min-height: 400px;
         position: relative;
+        display: flex;
+        align-items: center;
     }
 
     .btn--logout {
