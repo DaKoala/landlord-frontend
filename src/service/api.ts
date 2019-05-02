@@ -1,17 +1,9 @@
-import ajax from './ajax';
-
-interface BaseResponse<T> {
-    data: T,
-}
-
-interface BaseData {
-    status: number;
-    msg: string;
-}
+import { BaseResponse, BaseData, ajax } from '@/service/ajax';
 
 export function login(username: string, password: string): Promise<BaseResponse<BaseData>> {
     return ajax({
-        url: '/user',
+        method: 'post',
+        url: '/login',
         data: {
             username,
             password,
@@ -22,10 +14,16 @@ export function login(username: string, password: string): Promise<BaseResponse<
 export function register(username: string, password: string): Promise<BaseResponse<BaseData>> {
     return ajax({
         method: 'post',
-        url: '/user',
+        url: '/register',
         data: {
             username,
             password,
         },
+    });
+}
+
+export function me(): Promise<BaseResponse<BaseData>> {
+    return ajax({
+        url: '/me',
     });
 }

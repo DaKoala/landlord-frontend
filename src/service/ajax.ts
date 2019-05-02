@@ -1,6 +1,15 @@
 import axios from 'axios';
 import BASE_URL from './config';
 
+export interface BaseResponse<T> {
+    data: T,
+}
+
+export interface BaseData {
+    status: number;
+    msg: string;
+}
+
 interface Config {
     url: string;
     method?: string;
@@ -12,7 +21,7 @@ interface Config {
     }
 }
 
-export default function ajax(params: Config): Promise<any> {
+export function ajax(params: Config): Promise<BaseResponse<BaseData>> {
     const method = params.method || 'get';
     return axios({
         method,

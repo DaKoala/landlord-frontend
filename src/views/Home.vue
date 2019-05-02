@@ -18,6 +18,7 @@
                     <input class="form__input" type="password" v-model="user.confirmPassword">
                 </label>
                 <div class="form__submit" @click="submit">{{ header }}</div>
+                <a :href="googleUrl">OAuth</a>
             </form>
         </main>
     </div>
@@ -25,10 +26,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { login, register } from '@/service/api';
+import { login, register, me } from '@/service/api';
+import BASE_URL from '@/service/config';
 
 @Component
 export default class Home extends Vue {
+    baseUrl = BASE_URL;
+
     isLogin = true;
 
     user = {
@@ -39,6 +43,14 @@ export default class Home extends Vue {
 
     get header() {
         return this.isLogin ? 'Login' : 'Register';
+    }
+
+    get googleUrl() {
+        return `${this.baseUrl}/login/google`;
+    }
+
+    async created() {
+        this.$auth();
     }
 
     changeForm() {
