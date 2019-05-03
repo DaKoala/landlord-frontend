@@ -17,8 +17,12 @@
                     <input class="form__input" type="password" v-model="user.confirmPassword">
                 </label>
                 <div class="form__submit" @click="submit">{{ header }}</div>
-                <a class="form__submit form__submit--google" :href="googleUrl" v-if="isLogin">
-                    <img class="form__google" :src="googleIcon"/>
+                <a class="form__submit form__submit--google"
+                   :class="{'form__submit--dark': !isLogin}"
+                   :href="googleUrl">
+                    <div class="form__icon-container">
+                        <img class="form__google" :src="googleIcon"/>
+                    </div>
                     Sign in with Google
                 </a>
                 <div class="form__transform" :class="{'form__transform--register': !isLogin}">
@@ -171,10 +175,12 @@ export default class Home extends Vue {
 
     .form__submit {
         @include button;
+        position: relative;
         background-color: $dark-green;
         color: $white;
         margin-top: 40px;
         min-width: 300px;
+        overflow: hidden;
     }
 
     .form__submit--google {
@@ -187,10 +193,15 @@ export default class Home extends Vue {
         color: gray;
     }
 
+    .form__submit--dark {
+        background-color: #4285f4;
+        color: white;
+    }
+
     .form__google {
+        background-color: white;
         width: 25px;
         height: 25px;
-        margin-right: 20px;
     }
 
     .form__transform {
@@ -206,5 +217,16 @@ export default class Home extends Vue {
     .form__transform-button {
         color: #409eff;
         cursor: pointer;
+    }
+
+    .form__icon-container {
+        width: 43px;
+        height: 43px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
     }
 </style>
