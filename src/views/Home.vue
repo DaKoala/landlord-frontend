@@ -2,8 +2,7 @@
     <div class="home" :class="{'home--register': !isLogin}">
         <main class="main">
             <h1 class="header"
-                :class="{'header--register': !isLogin}"
-                @click="changeForm">{{ header }}</h1>
+                :class="{'header--register': !isLogin}">{{ header }}</h1>
             <form class="form" :class="{'form--register': !isLogin}">
                 <label>
                     <div class="form__label form__label--first">Username</div>
@@ -18,7 +17,15 @@
                     <input class="form__input" type="password" v-model="user.confirmPassword">
                 </label>
                 <div class="form__submit" @click="submit">{{ header }}</div>
-                <a :href="googleUrl">OAuth</a>
+                <a class="form__submit form__submit--google" :href="googleUrl" v-if="isLogin">
+                    <img class="form__google" :src="googleIcon"/>
+                    Sign in with Google
+                </a>
+                <div class="form__transform" :class="{'form__transform--register': !isLogin}">
+                    {{ transformText }}
+                    <span class="form__transform-button"
+                          @click="changeForm">{{ transformButton }}</span>
+                </div>
             </form>
         </main>
     </div>
@@ -29,11 +36,15 @@ import { Component, Vue } from 'vue-property-decorator';
 import { login, register } from '@/service/api';
 import BASE_URL from '@/service/config';
 
+const google = require('../assets/images/google.png');
+
 @Component
 export default class Home extends Vue {
     baseUrl = BASE_URL;
 
     isLogin = true;
+
+    googleIcon = google;
 
     user = {
         username: '',
@@ -42,7 +53,15 @@ export default class Home extends Vue {
     };
 
     get header() {
-        return this.isLogin ? 'Login' : 'Register';
+        return this.isLogin ? 'Log in' : 'Sign up';
+    }
+
+    get transformText() {
+        return this.isLogin ? 'Don\' have an account?' : 'Have an account?';
+    }
+
+    get transformButton() {
+        return this.isLogin ? 'Sign up' : 'Log in';
     }
 
     get googleUrl() {
@@ -114,7 +133,6 @@ export default class Home extends Vue {
     .header {
         color: $light-green;
         font-size: 3rem;
-        cursor: pointer;
     }
 
     .header--register {
@@ -157,5 +175,36 @@ export default class Home extends Vue {
         color: $white;
         margin-top: 40px;
         min-width: 300px;
+    }
+
+    .form__submit--google {
+        margin-top: 20px;
+        height: 43px;
+        font-size: 18px;
+        text-decoration: none;
+        font-family: 'Roboto', sans-serif;
+        background-color: white;
+        color: gray;
+    }
+
+    .form__google {
+        width: 25px;
+        height: 25px;
+        margin-right: 20px;
+    }
+
+    .form__transform {
+        margin-top: 15px;
+        font-weight: bold;
+        color: $white;
+    }
+
+    .form__transform--register {
+        color: $dark-green;
+    }
+
+    .form__transform-button {
+        color: #409eff;
+        cursor: pointer;
     }
 </style>
