@@ -27,11 +27,13 @@
                 <div class="create__header">Create Room</div>
                 <label>
                     <div class="create__label create__label--first">Room name</div>
-                    <input class="create__input" type="text">
+                    <input class="create__input" type="text" v-model="newRoom.name">
                 </label>
                 <label>
                     <div class="create__label">Description (optional)</div>
-                    <textarea class="create__input create__input--area"></textarea>
+                    <textarea
+                        class="create__input create__input--area"
+                        v-model="newRoom.description"></textarea>
                 </label>
                 <div class="create__btn">
                     Create
@@ -44,16 +46,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import GameRoom from '@/components/GameRoom.vue';
-import { me, logout } from '@/service/api';
+import {
+    Room, me, logout, getAllRooms,
+} from '@/service/api';
 
 interface User {
     username: string;
     chip: number;
-}
-interface Room {
-    people: number;
-    name: string;
-    description?: string;
 }
 
 @Component({
@@ -65,24 +64,26 @@ export default class Dashboard extends Vue {
         chip: 0,
     };
 
-    rooms: Room[] = [
-        {
-            people: 1,
-            name: 'Game room',
-            description: 'Fight the landlord!',
-        },
-        {
-            people: 2,
-            name: 'Let\'s play',
-        },
-        {
-            people: 3,
-            name: 'Game room Game room Game room',
-            description: 'Fight the landlord!',
-        },
-    ];
+    newRoom = {
+        name: '',
+        description: '',
+    };
+
+    rooms: Room[] = [];
 
     async created() {
+        this.fetchUserInfo();
+        this.fetchRooms();
+    }
+
+    async fetchRooms() {
+        const { data } = await getAllRooms();
+        if (data.status === 200) {
+            this.rooms = data.rooms;
+        }
+    }
+
+    async fetchUserInfo() {
         const { data } = await me();
         if (data.status === 200) {
             this.user.username = data.user.username;

@@ -42,14 +42,14 @@ export function logout(): Promise<BaseResponse<BaseData>> {
     });
 }
 
-export interface RoomInfo {
+export interface Room {
+    people: number;
     name: string;
     description: string;
-    people: number;
 }
 
 interface GetAllRoomsData extends BaseData {
-    rooms: RoomInfo[];
+    rooms: Room[];
 }
 
 export function getAllRooms(): Promise<BaseResponse<GetAllRoomsData>> {
