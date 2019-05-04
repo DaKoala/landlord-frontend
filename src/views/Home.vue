@@ -106,7 +106,7 @@ export default class Home extends Vue {
         }
         const { data } = await login(this.user.username, this.user.password);
         if (data.status === 200) {
-            alert('Authorized!');
+            this.$router.push('/dashboard');
         } else {
             alert(data.msg);
         }

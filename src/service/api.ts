@@ -27,3 +27,41 @@ export function me(): Promise<BaseResponse<BaseData>> {
         url: '/me',
     });
 }
+
+export function logout(): Promise<BaseResponse<BaseData>> {
+    return ajax({
+        url: '/logout',
+    });
+}
+
+export interface RoomInfo {
+    name: string;
+    description: string;
+    people: number;
+}
+
+interface GetAllRoomsData extends BaseData {
+    rooms: RoomInfo[];
+}
+
+export function getAllRooms(): Promise<BaseResponse<GetAllRoomsData>> {
+    return ajax({
+        url: '/room',
+    });
+}
+
+interface CreateRoomData extends BaseData {
+    roomName: string;
+}
+
+export function createRoom(roomName: string, description: string):
+    Promise<BaseResponse<CreateRoomData>> {
+    return ajax({
+        method: 'post',
+        url: '/room',
+        data: {
+            roomName,
+            description,
+        },
+    });
+}
