@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="dashboard">
         <div class="left">
             <div class="line line--top">
                 <p>
@@ -86,9 +86,14 @@ export default class Dashboard extends Vue {
 <style lang="scss" scoped>
     @import "../assets/scss/main";
 
+    .dashboard {
+        display: flex;
+    }
+
     .left {
         position: relative;
         min-height: 100vh;
+        min-width: 980px;
         height: 100%;
         width: 70vw;
         background-color: $white;
@@ -97,10 +102,9 @@ export default class Dashboard extends Vue {
 
     .right {
         width: 30vw;
-        position: fixed;
-        right: 0;
-        top: 0;
-        bottom: 0;
+        min-height: 100vh;
+        height: 100%;
+        min-width: 420px;
         background-color: $light-green;
         display: flex;
         align-items: center;
@@ -193,7 +197,6 @@ export default class Dashboard extends Vue {
         background-color: $red;
         padding: 10px 50px;
         position: absolute;
-        bottom: 150px;
         left: 50%;
         transform: translateX(-50%);
     }

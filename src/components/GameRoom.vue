@@ -38,7 +38,7 @@ export default class GameRoom extends Vue {
     @import "../assets/scss/main";
 
     .game {
-        margin-right: 50px;
+        margin-right: 30px;
         max-width: 300px;
         overflow: hidden;
     }
