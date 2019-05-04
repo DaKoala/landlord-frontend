@@ -7,8 +7,8 @@
                     <span class="text--main">{{ user.username }}</span>
                 </p>
                 <p>
-                    <span class="text--support">Score: </span>
-                    <span class="text--main">{{ user.score }}</span>
+                    <span class="text--support">Chip: </span>
+                    <span class="text--main">{{ user.chip }}</span>
                 </p>
             </div>
             <div class="line line--second">
@@ -20,7 +20,7 @@
                 </div>
                 <GameRoom v-for="(room, index) in rooms" :room="room" :key="index"/>
             </div>
-            <div class="btn--logout">Log out</div>
+            <div class="btn--logout" @click="handleLogout">Log out</div>
         </div>
         <div class="right">
             <form class="create">
@@ -44,10 +44,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import GameRoom from '@/components/GameRoom.vue';
+import { me, logout } from '@/service/api';
 
 interface User {
     username: string;
-    score: number;
+    chip: number;
 }
 interface Room {
     people: number;
@@ -60,8 +61,8 @@ interface Room {
 })
 export default class Dashboard extends Vue {
     user: User = {
-        username: 'Egret',
-        score: 300,
+        username: '',
+        chip: 0,
     };
 
     rooms: Room[] = [
@@ -80,6 +81,23 @@ export default class Dashboard extends Vue {
             description: 'Fight the landlord!',
         },
     ];
+
+    async created() {
+        const { data } = await me();
+        if (data.status === 200) {
+            this.user.username = data.user.username;
+            this.user.chip = data.user.chip;
+        }
+    }
+
+    async handleLogout() {
+        try {
+            await logout();
+            this.$router.push('/');
+        } catch (e) {
+            this.$router.push('/');
+        }
+    }
 }
 </script>
 

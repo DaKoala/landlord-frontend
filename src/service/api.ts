@@ -22,7 +22,15 @@ export function register(username: string, password: string): Promise<BaseRespon
     });
 }
 
-export function me(): Promise<BaseResponse<BaseData>> {
+interface MeData extends BaseData {
+    user: {
+        username: string;
+        name: string;
+        chip: number;
+    }
+}
+
+export function me(): Promise<BaseResponse<MeData>> {
     return ajax({
         url: '/me',
     });
