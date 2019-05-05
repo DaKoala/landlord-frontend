@@ -1,13 +1,15 @@
 <template>
     <div class="room">
-        <div class="left"></div>
+        <div class="left">
+            Room: {{ room.name }}
+        </div>
         <div class="right"></div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { authorizeSocket } from '@/service/api';
+import { authorizeSocket, getRoomInfo } from '@/service/api';
 import io from 'socket.io-client';
 import BASE_URL from '@/service/config';
 
@@ -15,13 +17,23 @@ import BASE_URL from '@/service/config';
 export default class Room extends Vue {
     socket = io(BASE_URL);
 
+    room = {
+        name: '',
+    };
+
     created() {
         this.socket.on('connect', async () => {
             try {
-                const { data } = await authorizeSocket(this.socket.id);
-                if (data.status !== 200) {
+                const { data } = await authorizeSocket(this.socket.id, this.$route.params.roomName);
+                if (data.status === 200) {
+                    const { data: roomData } = await getRoomInfo(this.$route.params.roomName);
+                    if (roomData.status === 200) {
+                        this.room.name = roomData.name;
+                    }
+                } else {
                     alert('Unauthorized user!');
                     this.$router.push('/dashboard');
+                    this.socket.disconnect();
                 }
             } catch (e) {
                 alert('Server error! Please try again');

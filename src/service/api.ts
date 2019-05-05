@@ -74,12 +74,26 @@ export function createRoom(roomName: string, description: string):
     });
 }
 
-export function authorizeSocket(socketId: string): Promise<BaseResponse<BaseData>> {
+export function authorizeSocket(socketId: string, roomName: string):
+    Promise<BaseResponse<BaseData>> {
     return ajax({
         method: 'post',
         url: '/socket',
         data: {
             socketId,
+            roomName,
         },
+    });
+}
+
+interface GetRoomInfoData extends BaseData {
+    name: string;
+    description: string;
+    players: string[];
+}
+
+export function getRoomInfo(roomName: string): Promise<BaseResponse<GetRoomInfoData>> {
+    return ajax({
+        url: `/room/${roomName}`,
     });
 }

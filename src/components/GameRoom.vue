@@ -1,5 +1,5 @@
 <template>
-    <div class="game">
+    <div class="game" @click="enterRoom">
         <img :src="icon" class="game__icon" alt="two people in a room"/>
         <p class="game__people">{{ people }}</p>
         <p class="game__desc">Room name: {{ room.name }}</p>
@@ -31,6 +31,10 @@ export default class GameRoom extends Vue {
         }
         return `Need ${MAX_PEOPLE - this.room.people}`;
     }
+
+    enterRoom() {
+        this.$router.push(`/room/${this.room.name}`);
+    }
 }
 </script>
 
@@ -41,6 +45,7 @@ export default class GameRoom extends Vue {
         margin-right: 30px;
         max-width: 300px;
         overflow: hidden;
+        cursor: pointer;
     }
 
     .game__icon {
