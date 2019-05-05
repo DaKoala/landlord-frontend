@@ -59,7 +59,7 @@ export function getAllRooms(): Promise<BaseResponse<GetAllRoomsData>> {
 }
 
 interface CreateRoomData extends BaseData {
-    roomName: string;
+    room: Room;
 }
 
 export function createRoom(roomName: string, description: string):

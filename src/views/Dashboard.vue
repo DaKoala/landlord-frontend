@@ -35,7 +35,7 @@
                         class="create__input create__input--area"
                         v-model="newRoom.description"></textarea>
                 </label>
-                <div class="create__btn">
+                <div class="create__btn" @click="handleCreateRoom">
                     Create
                 </div>
             </form>
@@ -47,7 +47,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import GameRoom from '@/components/GameRoom.vue';
 import {
-    Room, me, logout, getAllRooms,
+    Room, me, logout, getAllRooms, createRoom,
 } from '@/service/api';
 
 interface User {
@@ -97,6 +97,21 @@ export default class Dashboard extends Vue {
             this.$router.push('/');
         } catch (e) {
             this.$router.push('/');
+        }
+    }
+
+    async handleCreateRoom() {
+        try {
+            const { data } = await createRoom(this.newRoom.name, this.newRoom.description);
+            if (data.status === 200) {
+                this.rooms.push(data.room);
+                this.newRoom.name = '';
+                this.newRoom.description = '';
+            } else {
+                alert(data.msg);
+            }
+        } catch (e) {
+            alert('Server error! Please try again.');
         }
     }
 }
