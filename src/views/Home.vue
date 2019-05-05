@@ -104,11 +104,15 @@ export default class Home extends Vue {
             alert('Username or password cannot be empty!');
             return;
         }
-        const { data } = await login(this.user.username, this.user.password);
-        if (data.status === 200) {
-            this.$router.push('/dashboard');
-        } else {
-            alert(data.msg);
+        try {
+            const { data } = await login(this.user.username, this.user.password);
+            if (data.status === 200) {
+                this.$router.push('/dashboard');
+            } else {
+                alert(data.msg);
+            }
+        } catch (e) {
+            alert('Incorrect username / password!');
         }
     }
 }
