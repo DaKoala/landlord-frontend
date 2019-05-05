@@ -12,7 +12,7 @@ const router = new Router({
             name: 'home',
             component: Home,
             meta: {
-                title: 'Fight The Landlord',
+                title: 'Texas Hold\'em',
             },
         },
         {
@@ -21,6 +21,14 @@ const router = new Router({
             component: () => import('./views/Dashboard.vue'),
             meta: {
                 title: 'Dashboard',
+            },
+        },
+        {
+            path: '/room/:roomName',
+            name: 'room',
+            component: () => import('./views/Room.vue'),
+            meta: {
+                title: 'Game Room',
             },
         },
     ],
@@ -39,7 +47,7 @@ router.beforeEach(async (to: any, from: any, next: any) => {
         document.title = 'Dashboard';
     } else if (!authorized && to.path !== '/') {
         next('/');
-        document.title = 'Fight The Landlord';
+        document.title = 'Texas Hold\'em';
     } else {
         next();
         document.title = to.meta.title;

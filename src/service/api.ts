@@ -73,3 +73,13 @@ export function createRoom(roomName: string, description: string):
         },
     });
 }
+
+export function authorizeSocket(socketId: string): Promise<BaseResponse<BaseData>> {
+    return ajax({
+        method: 'post',
+        url: '/socket',
+        data: {
+            socketId,
+        },
+    });
+}
