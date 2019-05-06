@@ -2,6 +2,13 @@
     <div class="room">
         <div class="left">
             <div class="room__name">Room: {{ room.name }}</div>
+            <div class="announcement">
+                <div>{{ announcement }}</div>
+                <div>
+                    <font-awesome-icon :icon="['fas', 'funnel-dollar']"></font-awesome-icon>
+                    <span>{{ pot }}</span>
+                </div>
+            </div>
             <div class="public">
                 <PokerCard v-for="card in publicCards" :card="card" :key="card.point + card.suit"/>
             </div>
@@ -35,6 +42,11 @@
                     <font-awesome-icon :icon="['fas', 'hand-holding-usd']"></font-awesome-icon>
                     {{ player.betChip }}
                 </div>
+                <div class="player__cards">
+                    <PokerCard v-for="card in player.cards"
+                               :key="card.point + card.suit"
+                               :card="card"/>
+                </div>
             </div>
         </div>
         <div class="right">
@@ -64,6 +76,7 @@ interface Card {
 
 interface PlayerInGame extends Player {
     betChip: number;
+    cards: Card[];
 }
 
 @Component({
@@ -72,10 +85,15 @@ interface PlayerInGame extends Player {
 export default class Room extends Vue {
     socket = io(BASE_URL);
 
+    announcement = 'Waiting for players...';
+
+    pot = 0;
+
     me: PlayerInGame = {
         username: this.$store.state.username,
         chip: this.$store.state.chip,
         betChip: 0,
+        cards: [],
     };
 
     publicCards: Card[] = [
@@ -106,7 +124,7 @@ export default class Room extends Vue {
                     if (roomData.status === 200) {
                         this.room.name = roomData.name;
                         this.room.players = roomData.players.map(
-                            player => Object.assign(player, { betChip: 0 }),
+                            player => Object.assign(player, { betChip: 0, cards: [] }),
                         );
                         this.listenEvents();
                     }
@@ -122,7 +140,7 @@ export default class Room extends Vue {
         });
     }
 
-    getPlayerByName(username: string): Player {
+    getPlayerByName(username: string): PlayerInGame {
         if (username === this.me.username) {
             return this.me;
         }
@@ -137,14 +155,32 @@ export default class Room extends Vue {
     listenEvents() {
         this.socket.on('join', this.onNewPlayer);
         this.socket.on('publicCard', this.onPublicCard);
+        this.socket.on('announcement', this.onAnnouncement);
+        this.socket.on('bet', this.onBet);
+        this.socket.on('card', this.onCard);
     }
 
     onNewPlayer(player: Player) {
-        this.room.players.push(Object.assign(player, { betChip: 0 }));
+        this.room.players.push(Object.assign(player, { betChip: 0, cards: [] }));
     }
 
     onPublicCard(card: Card) {
         this.publicCards.push(card);
+    }
+
+    onAnnouncement(message: string) {
+        this.announcement = message;
+    }
+
+    onBet(payload: { username: string, chip: number }) {
+        const player = this.getPlayerByName(payload.username);
+        player.chip -= payload.chip;
+        player.betChip += payload.chip;
+    }
+
+    onCard(payload: { username: string, card: Card }) {
+        const player = this.getPlayerByName(payload.username);
+        player.cards.push(payload.card);
     }
 }
 </script>
@@ -223,11 +259,30 @@ export default class Room extends Vue {
         color: $red;
     }
 
+    .player__cards {
+        display: flex;
+        transform: scale(0.5, 0.5);
+    }
+
     .public {
         position: absolute;
         top: 20%;
         left: 50%;
         display: flex;
         transform: translateX(-50%);
+    }
+
+    .announcement {
+        text-align: center;
+        position: absolute;
+        font-size: 36px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: $light-green;
+    }
+
+    .announcement span {
+        margin-left: 10px;
     }
 </style>
