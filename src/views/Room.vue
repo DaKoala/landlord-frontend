@@ -2,6 +2,9 @@
     <div class="room">
         <div class="left">
             <div class="room__name">Room: {{ room.name }}</div>
+            <div class="public">
+                <PokerCard/>
+            </div>
             <div class="player--me">
                 <div>
                     <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
@@ -44,8 +47,10 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Player, authorizeSocket, getRoomInfo } from '@/service/api';
 import io from 'socket.io-client';
 import BASE_URL from '@/service/config';
-
-@Component
+import PokerCard from '@/components/PokerCard.vue';
+@Component({
+    components: { PokerCard },
+})
 export default class Room extends Vue {
     socket = io(BASE_URL);
 
@@ -110,7 +115,7 @@ export default class Room extends Vue {
         min-width: 980px;
         height: 100%;
         width: 70vw;
-        background-color: $white;
+        background-color: $dark-green;
         padding: 100px;
     }
 
@@ -151,7 +156,7 @@ export default class Room extends Vue {
         top: 50%;
         transform: translateY(-50%);
         font-size: 36px;
-        color: $dark-green;
+        color: $white;
     }
 
     .player--left {
@@ -168,5 +173,12 @@ export default class Room extends Vue {
         bottom: 100px;
         font-size: 36px;
         color: $red;
+    }
+
+    .public {
+        position: absolute;
+        top: 50%;
+        transform: translateX(-50%);
+        display: flex;
     }
 </style>
