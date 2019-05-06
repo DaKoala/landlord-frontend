@@ -86,10 +86,15 @@ export function authorizeSocket(socketId: string, roomName: string):
     });
 }
 
+export interface Player {
+    username: string;
+    chip: number;
+}
+
 interface GetRoomInfoData extends BaseData {
     name: string;
     description: string;
-    players: string[];
+    players: Player[];
 }
 
 export function getRoomInfo(roomName: string): Promise<BaseResponse<GetRoomInfoData>> {

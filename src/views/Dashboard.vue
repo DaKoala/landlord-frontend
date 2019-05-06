@@ -88,6 +88,10 @@ export default class Dashboard extends Vue {
         if (data.status === 200) {
             this.user.username = data.user.username;
             this.user.chip = data.user.chip;
+            this.$store.commit('updateUser', {
+                username: data.user.username,
+                chip: data.user.chip,
+            });
         }
     }
 
