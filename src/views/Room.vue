@@ -10,7 +10,9 @@
                 </div>
             </div>
             <div class="public">
-                <PokerCard v-for="card in publicCards" :card="card" :key="card.point + card.suit"/>
+                <PokerCard v-for="card in publicCards"
+                           :card="card"
+                           :key="String(card.point) + String(card.suit)"/>
             </div>
             <div class="player--me">
                 <div>
@@ -24,6 +26,27 @@
                 <div>
                     <font-awesome-icon :icon="['fas', 'hand-holding-usd']"></font-awesome-icon>
                     {{ me.betChip }}
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel__buttons">
+                    <div class="panel__button"
+                         v-if="options.fold"
+                         @click="clickFold">Fold</div>
+                    <div class="panel__button panel__button--green"
+                         v-if="options.raise"
+                         @click="clickRaise">Raise</div>
+                    <div class="panel__button panel__button--green"
+                         v-if="options.call"
+                         @click="clickCall">Call</div>
+                    <div class="panel__button panel__button--green"
+                         v-if="options.check"
+                         @click="clickCheck">Check</div>
+                </div>
+                <div class="panel__cards">
+                    <PokerCard v-for="card in me.cards"
+                               :key="String(card.point) + String(card.suit)"
+                               :card="card"></PokerCard>
                 </div>
             </div>
             <div v-for="(player, index) in otherPlayers"
@@ -44,7 +67,7 @@
                 </div>
                 <div class="player__cards">
                     <PokerCard v-for="card in player.cards"
-                               :key="card.point + card.suit"
+                               :key="String(card.point) + String(card.suit)"
                                :card="card"/>
                 </div>
             </div>
@@ -74,6 +97,13 @@ interface Card {
     suit: number;
 }
 
+interface Options {
+    fold: boolean;
+    check: boolean;
+    call: boolean;
+    raise: boolean;
+}
+
 interface PlayerInGame extends Player {
     betChip: number;
     cards: Card[];
@@ -87,6 +117,13 @@ export default class Room extends Vue {
 
     announcement = 'Waiting for players...';
 
+    options: Options = {
+        fold: false,
+        check: false,
+        call: false,
+        raise: false,
+    };
+
     pot = 0;
 
     me: PlayerInGame = {
@@ -97,6 +134,22 @@ export default class Room extends Vue {
     };
 
     publicCards: Card[] = [
+        {
+            point: 13,
+            suit: 2,
+        },
+        {
+            point: 13,
+            suit: 2,
+        },
+        {
+            point: 13,
+            suit: 2,
+        },
+        {
+            point: 13,
+            suit: 2,
+        },
         {
             point: 13,
             suit: 2,
@@ -158,6 +211,10 @@ export default class Room extends Vue {
         this.socket.on('announcement', this.onAnnouncement);
         this.socket.on('bet', this.onBet);
         this.socket.on('card', this.onCard);
+        this.socket.on('myTurn', this.onMyTurn);
+        this.socket.on('endTurn', this.onEndTurn);
+        this.socket.on('addMoney', this.onMoneyAdd);
+        this.socket.on('endGame', this.onEndGame);
     }
 
     onNewPlayer(player: Player) {
@@ -176,11 +233,57 @@ export default class Room extends Vue {
         const player = this.getPlayerByName(payload.username);
         player.chip -= payload.chip;
         player.betChip += payload.chip;
+        this.pot += payload.chip;
     }
 
     onCard(payload: { username: string, card: Card }) {
         const player = this.getPlayerByName(payload.username);
         player.cards.push(payload.card);
+    }
+
+    onMyTurn(options: Options) {
+        this.options = options;
+    }
+
+    onEndTurn() {
+        this.options = {
+            fold: false,
+            raise: false,
+            call: false,
+            check: false,
+        };
+    }
+
+    onMoneyAdd(payload: { username: string, chip: number }) {
+        const player = this.getPlayerByName(payload.username);
+        player.chip += payload.chip;
+    }
+
+    onEndGame() {
+        this.publicCards = [];
+        this.me.cards = [];
+        this.me.betChip = 0;
+        this.room.players.forEach((player) => {
+            player.cards = [];
+            player.betChip = 0;
+        });
+        this.announcement = 'Waiting for next game...';
+    }
+
+    clickFold() {
+        this.socket.emit('fold');
+    }
+
+    clickRaise() {
+        this.socket.emit('raise');
+    }
+
+    clickCall() {
+        this.socket.emit('call');
+    }
+
+    clickCheck() {
+        this.socket.emit('check');
     }
 }
 </script>
@@ -248,7 +351,7 @@ export default class Room extends Vue {
     }
 
     .player--right {
-        right: 100px;
+        right: 75px;
     }
 
     .player--me {
@@ -284,5 +387,36 @@ export default class Room extends Vue {
 
     .announcement span {
         margin-left: 10px;
+    }
+
+    .panel {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 100px;
+    }
+
+    .panel__cards {
+        display: flex;
+        justify-content: center;
+    }
+
+    .panel__buttons {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .panel__button {
+        @include button;
+        background-color: $red;
+        color: $white;
+        width: 120px;
+        height: 50px;
+        margin: 0 20px;
+    }
+
+    .panel__button--green {
+        background-color: $light-green;
     }
 </style>
