@@ -2,6 +2,29 @@
     <div class="room">
         <div class="left">
             <div class="room__name">Room: {{ room.name }}</div>
+            <div class="player--me">
+                <div>
+                    <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
+                    {{ me.username }}
+                </div>
+                <div>
+                    <font-awesome-icon :icon="['fas', 'coins']"></font-awesome-icon>
+                    {{ me.chip }}
+                </div>
+            </div>
+            <div v-for="(player, index) in otherPlayers"
+                 :key="player.username + player.chip"
+                 class="player"
+                 :class="{'player--left': index === 0, 'player--right': index === 1}">
+                <div>
+                    <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
+                    {{ player.username }}
+                </div>
+                <div>
+                    <font-awesome-icon :icon="['fas', 'coins']"></font-awesome-icon>
+                    {{ player.chip }}
+                </div>
+            </div>
         </div>
         <div class="right">
             <div class="info">
@@ -38,6 +61,10 @@ export default class Room extends Vue {
         name: '',
         players: [],
     };
+
+    get otherPlayers() {
+        return this.room.players.filter(player => player.username !== this.me.username);
+    }
 
     created() {
         this.socket.on('connect', async () => {
@@ -116,6 +143,30 @@ export default class Room extends Vue {
     }
 
     .info__list--me {
+        color: $red;
+    }
+
+    .player {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 36px;
+        color: $dark-green;
+    }
+
+    .player--left {
+        left: 100px;
+    }
+
+    .player--right {
+        right: 100px;
+    }
+
+    .player--me {
+        position: absolute;
+        left: 100px;
+        bottom: 100px;
+        font-size: 36px;
         color: $red;
     }
 </style>
