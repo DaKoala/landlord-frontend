@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
     faUser,
     faCoins,
+    faHandHoldingUsd,
 } from '@fortawesome/free-solid-svg-icons';
 import App from './App.vue';
 import router from './router';
@@ -12,6 +13,7 @@ import store from './store';
 library.add(
     faUser,
     faCoins,
+    faHandHoldingUsd,
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);

@@ -3,7 +3,7 @@
         <div class="left">
             <div class="room__name">Room: {{ room.name }}</div>
             <div class="public">
-                <PokerCard/>
+                <PokerCard v-for="card in publicCards" :card="card" :key="card.point + card.suit"/>
             </div>
             <div class="player--me">
                 <div>
@@ -13,6 +13,10 @@
                 <div>
                     <font-awesome-icon :icon="['fas', 'coins']"></font-awesome-icon>
                     {{ me.chip }}
+                </div>
+                <div>
+                    <font-awesome-icon :icon="['fas', 'hand-holding-usd']"></font-awesome-icon>
+                    {{ me.betChip }}
                 </div>
             </div>
             <div v-for="(player, index) in otherPlayers"
@@ -26,6 +30,10 @@
                 <div>
                     <font-awesome-icon :icon="['fas', 'coins']"></font-awesome-icon>
                     {{ player.chip }}
+                </div>
+                <div>
+                    <font-awesome-icon :icon="['fas', 'hand-holding-usd']"></font-awesome-icon>
+                    {{ player.betChip }}
                 </div>
             </div>
         </div>
@@ -48,20 +56,38 @@ import { Player, authorizeSocket, getRoomInfo } from '@/service/api';
 import io from 'socket.io-client';
 import BASE_URL from '@/service/config';
 import PokerCard from '@/components/PokerCard.vue';
+
+interface Card {
+    point: number;
+    suit: number;
+}
+
+interface PlayerInGame extends Player {
+    betChip: number;
+}
+
 @Component({
     components: { PokerCard },
 })
 export default class Room extends Vue {
     socket = io(BASE_URL);
 
-    me = {
+    me: PlayerInGame = {
         username: this.$store.state.username,
         chip: this.$store.state.chip,
+        betChip: 0,
     };
+
+    publicCards: Card[] = [
+        {
+            point: 13,
+            suit: 2,
+        },
+    ];
 
     room: {
         name: string;
-        players: Player[];
+        players: PlayerInGame[];
     } = {
         name: '',
         players: [],
@@ -79,7 +105,9 @@ export default class Room extends Vue {
                     const { data: roomData } = await getRoomInfo(this.$route.params.roomName);
                     if (roomData.status === 200) {
                         this.room.name = roomData.name;
-                        this.room.players = roomData.players;
+                        this.room.players = roomData.players.map(
+                            player => Object.assign(player, { betChip: 0 }),
+                        );
                         this.listenEvents();
                     }
                 } else {
@@ -94,10 +122,29 @@ export default class Room extends Vue {
         });
     }
 
+    getPlayerByName(username: string): Player {
+        if (username === this.me.username) {
+            return this.me;
+        }
+        for (let i = 0; i < this.room.players.length; i += 1) {
+            if (this.room.players[i].username === username) {
+                return this.room.players[i];
+            }
+        }
+        return this.me;
+    }
+
     listenEvents() {
-        this.socket.on('join', (player: Player) => {
-            this.room.players.push(player);
-        });
+        this.socket.on('join', this.onNewPlayer);
+        this.socket.on('publicCard', this.onPublicCard);
+    }
+
+    onNewPlayer(player: Player) {
+        this.room.players.push(Object.assign(player, { betChip: 0 }));
+    }
+
+    onPublicCard(card: Card) {
+        this.publicCards.push(card);
     }
 }
 </script>
@@ -111,9 +158,7 @@ export default class Room extends Vue {
 
     .left {
         position: relative;
-        min-height: 100vh;
         min-width: 980px;
-        height: 100%;
         width: 70vw;
         background-color: $dark-green;
         padding: 100px;
@@ -121,10 +166,13 @@ export default class Room extends Vue {
 
     .right {
         width: 30vw;
-        min-height: 100vh;
-        height: 100%;
         min-width: 420px;
         background-color: $light-green;
+    }
+
+    .left, .right {
+        height: 100vh;
+        min-height: 800px;
     }
 
     .room__name {
@@ -177,8 +225,9 @@ export default class Room extends Vue {
 
     .public {
         position: absolute;
-        top: 50%;
-        transform: translateX(-50%);
+        top: 20%;
+        left: 50%;
         display: flex;
+        transform: translateX(-50%);
     }
 </style>

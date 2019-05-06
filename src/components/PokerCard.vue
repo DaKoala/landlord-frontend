@@ -23,10 +23,7 @@ interface Card {
 
 @Component
 export default class PokerCard extends Vue {
-    @Prop() card = {
-        point: 2,
-        suit: Suit.Diamond,
-    };
+    @Prop() card !: Card;
 
     get cardText() {
         if (this.card.point === 14) {
@@ -82,6 +79,7 @@ export default class PokerCard extends Vue {
         width: 120px;
         height: 160px;
         border-radius: 10px;
+        margin-right: 15px;
     }
 
     .card__text {
