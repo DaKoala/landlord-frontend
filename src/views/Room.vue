@@ -271,6 +271,7 @@ export default class Room extends Vue {
         this.publicCards = [];
         this.me.cards = [];
         this.me.betChip = 0;
+        this.pot = 0;
         this.room.players.forEach((player) => {
             player.cards = [];
             player.betChip = 0;
