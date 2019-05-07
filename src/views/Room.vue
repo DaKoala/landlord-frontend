@@ -14,7 +14,9 @@
                            :card="card"
                            :key="String(card.point) + String(card.suit)"/>
             </div>
-            <div class="player--me">
+            <div class="player--me"
+                 :class="{'player--fold': me.isFold,
+                 'player--inturn': me.username === playerInTurn}">
                 <div>
                     <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
                     {{ me.username }}
@@ -52,7 +54,10 @@
             <div v-for="(player, index) in otherPlayers"
                  :key="player.username + player.chip"
                  class="player"
-                 :class="{'player--left': index === 0, 'player--right': index === 1}">
+                 :class="{'player--left': index === 0,
+                 'player--fold': player.isFold,
+                 'player--right': index === 1,
+                 'player--inturn': player.username === playerInTurn}">
                 <div>
                     <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
                     {{ player.username }}
@@ -105,6 +110,7 @@ interface Options {
 }
 
 interface PlayerInGame extends Player {
+    isFold: boolean;
     betChip: number;
     cards: Card[];
 }
@@ -114,6 +120,8 @@ interface PlayerInGame extends Player {
 })
 export default class Room extends Vue {
     socket = io(BASE_URL);
+
+    playerInTurn = '';
 
     announcement = 'Waiting for players...';
 
@@ -129,6 +137,7 @@ export default class Room extends Vue {
     me: PlayerInGame = {
         username: this.$store.state.username,
         chip: this.$store.state.chip,
+        isFold: false,
         betChip: 0,
         cards: [],
     };
@@ -147,6 +156,14 @@ export default class Room extends Vue {
         return this.room.players.filter(player => player.username !== this.me.username);
     }
 
+    static extendPlayer(player: Player): PlayerInGame {
+        return Object.assign(player, {
+            isFold: false,
+            betChip: 0,
+            cards: [],
+        });
+    }
+
     created() {
         this.socket.on('connect', async () => {
             try {
@@ -156,7 +173,7 @@ export default class Room extends Vue {
                     if (roomData.status === 200) {
                         this.room.name = roomData.name;
                         this.room.players = roomData.players.map(
-                            player => Object.assign(player, { betChip: 0, cards: [] }),
+                            player => Room.extendPlayer(player),
                         );
                         this.listenEvents();
                     }
@@ -170,6 +187,15 @@ export default class Room extends Vue {
                 this.$router.push('/dashboard');
             }
         });
+    }
+
+    hideButtons() {
+        this.options = {
+            fold: false,
+            check: false,
+            call: false,
+            raise: false,
+        };
     }
 
     getPlayerByName(username: string): PlayerInGame {
@@ -191,14 +217,15 @@ export default class Room extends Vue {
         this.socket.on('bet', this.onBet);
         this.socket.on('card', this.onCard);
         this.socket.on('myTurn', this.onMyTurn);
-        this.socket.on('endTurn', this.onEndTurn);
+        this.socket.on('inTurn', this.onInTurn);
         this.socket.on('addMoney', this.onMoneyAdd);
         this.socket.on('endGame', this.onEndGame);
         this.socket.on('newRound', this.onNewRound);
+        this.socket.on('fold', this.onFold);
     }
 
     onNewPlayer(player: Player) {
-        this.room.players.push(Object.assign(player, { betChip: 0, cards: [] }));
+        this.room.players.push(Room.extendPlayer(player));
     }
 
     onPublicCard(card: Card) {
@@ -218,6 +245,9 @@ export default class Room extends Vue {
 
     onCard(payload: { username: string, card: Card }) {
         const player = this.getPlayerByName(payload.username);
+        if (player.cards.length === 2) {
+            return;
+        }
         player.cards.push(payload.card);
     }
 
@@ -225,13 +255,11 @@ export default class Room extends Vue {
         this.options = options;
     }
 
-    onEndTurn() {
-        this.options = {
-            fold: false,
-            raise: false,
-            call: false,
-            check: false,
-        };
+    onInTurn(username: string) {
+        if (username !== this.me.username) {
+            this.hideButtons();
+        }
+        this.playerInTurn = username;
     }
 
     onMoneyAdd(payload: { username: string, chip: number }) {
@@ -248,6 +276,7 @@ export default class Room extends Vue {
             player.betChip = 0;
         });
         this.announcement = 'Waiting for next game...';
+        this.hideButtons();
     }
 
     onNewRound() {
@@ -255,6 +284,12 @@ export default class Room extends Vue {
             player.betChip = 0;
         });
         this.me.betChip = 0;
+    }
+
+    onFold(username: string) {
+        const player = this.getPlayerByName(username);
+        player.isFold = true;
+        player.cards = [];
     }
 
     clickFold() {
@@ -349,6 +384,20 @@ export default class Room extends Vue {
         color: $red;
     }
 
+    .player--fold {
+        color: gray;
+    }
+
+    .player--inturn {
+        animation: {
+            name: twinkle;
+            duration: 1.5s;
+            direction: alternate;
+            iteration-count: infinite;
+            timing-function: linear;
+        }
+    }
+
     .player__cards {
         display: flex;
         transform: scale(0.5, 0.5);
@@ -405,5 +454,14 @@ export default class Room extends Vue {
 
     .panel__button--green {
         background-color: $light-green;
+    }
+
+    @keyframes twinkle {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0.2;
+        }
     }
 </style>
