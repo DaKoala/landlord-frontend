@@ -1,6 +1,10 @@
-# landlord-frontend
+# Texas Hold'em Poker Platform
 
-## Project setup
+_This is the final project for the course **Dynamic Web Applications**_
+
+This repository is the front-end part, powered by Vue.js.
+
+## Installation
 ```
 npm install
 ```
@@ -15,15 +19,7 @@ npm run serve
 npm run build
 ```
 
-### Run your tests
-```
-npm run test
-```
-
 ### Lints and fixes files
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -133,28 +133,7 @@ export default class Room extends Vue {
         cards: [],
     };
 
-    publicCards: Card[] = [
-        {
-            point: 13,
-            suit: 2,
-        },
-        {
-            point: 13,
-            suit: 2,
-        },
-        {
-            point: 13,
-            suit: 2,
-        },
-        {
-            point: 13,
-            suit: 2,
-        },
-        {
-            point: 13,
-            suit: 2,
-        },
-    ];
+    publicCards: Card[] = [];
 
     room: {
         name: string;
@@ -215,6 +194,7 @@ export default class Room extends Vue {
         this.socket.on('endTurn', this.onEndTurn);
         this.socket.on('addMoney', this.onMoneyAdd);
         this.socket.on('endGame', this.onEndGame);
+        this.socket.on('newRound', this.onNewRound);
     }
 
     onNewPlayer(player: Player) {
@@ -268,6 +248,13 @@ export default class Room extends Vue {
             player.betChip = 0;
         });
         this.announcement = 'Waiting for next game...';
+    }
+
+    onNewRound() {
+        this.room.players.forEach((player) => {
+            player.betChip = 0;
+        });
+        this.me.betChip = 0;
     }
 
     clickFold() {
