@@ -85,6 +85,9 @@
                        :class="{'info__list--me': me.username === player.username}"
                        :key="player.username">{{ player.username }}</p>
                 </div>
+                <div class="info__leave" @click="leaveRoom">
+                    Leave room
+                </div>
             </div>
         </div>
     </div>
@@ -189,6 +192,10 @@ export default class Room extends Vue {
         });
     }
 
+    destroyed() {
+        this.socket.disconnect();
+    }
+
     hideButtons() {
         this.options = {
             fold: false,
@@ -196,6 +203,14 @@ export default class Room extends Vue {
             call: false,
             raise: false,
         };
+    }
+
+    leaveRoom() {
+        const isSure = window.confirm('Do you really want to leave?\n'
+            + '(You will lose all chips you bet if the game has begun)');
+        if (isSure) {
+            this.$router.push('/dashboard');
+        }
     }
 
     getPlayerByName(username: string): PlayerInGame {
@@ -210,6 +225,14 @@ export default class Room extends Vue {
         return this.me;
     }
 
+    removePlayerByName(username: string): void {
+        for (let i = 0; i < this.room.players.length; i += 1) {
+            if (this.room.players[i].username === username) {
+                this.room.players.splice(i, 1);
+            }
+        }
+    }
+
     listenEvents() {
         this.socket.on('join', this.onNewPlayer);
         this.socket.on('publicCard', this.onPublicCard);
@@ -222,6 +245,7 @@ export default class Room extends Vue {
         this.socket.on('endGame', this.onEndGame);
         this.socket.on('newRound', this.onNewRound);
         this.socket.on('fold', this.onFold);
+        this.socket.on('leave', this.onLeftPlayer);
     }
 
     onNewPlayer(player: Player) {
@@ -295,6 +319,11 @@ export default class Room extends Vue {
         player.cards = [];
     }
 
+    onLeftPlayer(username: string) {
+        console.log('disconnect');
+        this.removePlayerByName(username);
+    }
+
     clickFold() {
         this.socket.emit('fold');
     }
@@ -321,7 +350,6 @@ export default class Room extends Vue {
     }
 
     .left {
-        position: relative;
         min-width: 980px;
         width: 70vw;
         background-color: $dark-green;
@@ -335,6 +363,7 @@ export default class Room extends Vue {
     }
 
     .left, .right {
+        position: relative;
         height: 100vh;
         min-height: 800px;
     }
@@ -361,6 +390,17 @@ export default class Room extends Vue {
 
     .info__list--me {
         color: $red;
+    }
+
+    .info__leave {
+        @include button;
+        position: absolute;
+        left: 50%;
+        bottom: 100px;
+        width: 250px;
+        color: $white;
+        background-color: $red;
+        transform: translateX(-50%);
     }
 
     .player {
@@ -404,6 +444,14 @@ export default class Room extends Vue {
     .player__cards {
         display: flex;
         transform: scale(0.5, 0.5);
+    }
+
+    .player--left .player__cards {
+        justify-content: flex-start;
+    }
+
+    .player--right .player__cards {
+        justify-content: flex-end;
     }
 
     .public {

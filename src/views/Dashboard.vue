@@ -105,6 +105,10 @@ export default class Dashboard extends Vue {
     }
 
     async handleCreateRoom() {
+        if (this.newRoom.name === '') {
+            alert('Room name cannot be empty!');
+            return;
+        }
         try {
             const { data } = await createRoom(this.newRoom.name, this.newRoom.description);
             if (data.status === 200) {

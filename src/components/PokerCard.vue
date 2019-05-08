@@ -79,7 +79,7 @@ export default class PokerCard extends Vue {
         width: 120px;
         height: 160px;
         border-radius: 10px;
-        margin-right: 15px;
+        margin: 0 15px;
     }
 
     .card__text {

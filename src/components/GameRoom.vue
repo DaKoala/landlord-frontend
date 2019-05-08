@@ -33,7 +33,9 @@ export default class GameRoom extends Vue {
     }
 
     enterRoom() {
-        this.$router.push(`/room/${this.room.name}`);
+        if (this.room.people !== 3) {
+            this.$router.push(`/room/${this.room.name}`);
+        }
     }
 }
 </script>
