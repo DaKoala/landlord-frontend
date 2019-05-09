@@ -6,6 +6,7 @@ import {
     faCoins,
     faHandHoldingUsd,
     faFunnelDollar,
+    faSyncAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import App from './App.vue';
 import router from './router';
@@ -16,6 +17,7 @@ library.add(
     faCoins,
     faHandHoldingUsd,
     faFunnelDollar,
+    faSyncAlt,
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);

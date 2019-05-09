@@ -13,6 +13,10 @@
             </div>
             <div class="line line--second">
                 <strong class="text--main">Existing Rooms:</strong>
+                <font-awesome-icon
+                    class="text--icon"
+                    :icon="['fas', 'sync-alt']"
+                    @click="fetchRooms"></font-awesome-icon>
             </div>
             <div class="rooms">
                 <div class="rooms__empty" v-if="rooms.length === 0">
@@ -201,6 +205,8 @@ export default class Dashboard extends Vue {
     }
 
     .line--second {
+        display: flex;
+        align-items: center;
         margin-top: 100px;
     }
 
@@ -216,6 +222,17 @@ export default class Dashboard extends Vue {
 
     .text--empty {
         color: $red;
+    }
+
+    .text--icon {
+        font-size: 48px;
+        margin-left: 20px;
+        cursor: pointer;
+        color: #c4c4c4;
+        transition: 0.5s;
+        &:hover {
+            color: $light-green;
+        }
     }
 
     .rooms__empty {
