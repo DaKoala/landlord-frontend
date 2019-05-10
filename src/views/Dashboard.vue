@@ -147,9 +147,11 @@ export default class Dashboard extends Vue {
     }
 
     .right {
+        position: fixed;
         width: 30vw;
-        min-height: 100vh;
-        height: 100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
         min-width: 420px;
         background-color: $light-green;
         display: flex;
